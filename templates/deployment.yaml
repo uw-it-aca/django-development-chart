@@ -45,10 +45,10 @@ spec:
             - name: ENV
               value: "dev"
             - name: PORT
-              value: "80"
+              value: "8080"
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           resources:
 {{ toYaml .Values.resources | indent 12 }}
