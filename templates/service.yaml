@@ -15,5 +15,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: {{ include "dev-helm.name" . }}
+    app.kubernetes.io/name:  {{ .Values.repo }}-dev-{{ .Values.branch }} 
     app.kubernetes.io/instance: {{ .Release.Name }}
