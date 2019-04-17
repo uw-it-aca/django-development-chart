@@ -44,6 +44,8 @@ spec:
               value: "rds.default.svc.cluster.local"
             - name: ENV
               value: "dev"
+            - name: PORT
+              value: "80"
           ports:
             - name: http
               containerPort: 80

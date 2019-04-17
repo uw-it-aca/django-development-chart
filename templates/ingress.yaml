@@ -16,7 +16,7 @@ metadata:
 {{- end }}
 spec:
   rules:
-    - host: {{ $branch }}.{{ .Values.repo }}-dev.aca-aws.s.uw.edu
+    - host: {{ $branch }}.{{ .Values.repo | replace "_" "-" }}-dev.aca-aws.s.uw.edu
       http:
         paths:
           - path: /
