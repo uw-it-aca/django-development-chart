@@ -1,4 +1,4 @@
-{{- $fullName := include "dev-helm.fullname" . -}}
+{{- $fullName := include "django-development-chart.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
 {{- $branch := .Values.branch}}
 apiVersion: extensions/v1beta1
@@ -6,8 +6,8 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app.kubernetes.io/name: {{ include "dev-helm.name" . }}
-    helm.sh/chart: {{ include "dev-helm.chart" . }}
+    app.kubernetes.io/name: {{ include "django-development-chart.name" . }}
+    helm.sh/chart: {{ include "django-development-chart.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- with .Values.ingress.annotations }}
@@ -21,5 +21,5 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: {{ .Values.repo }}-dev-{{ .Values.branch }}
+              serviceName: {{ include "django-development-chart.release-identifier" }}
               servicePort: http

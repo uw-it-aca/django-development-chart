@@ -1,26 +1,26 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ .Values.repo }}-dev-{{ .Values.branch }}
+  name: {{ include "django-development-chart.release-identifier" }}
   labels:
-    app.kubernetes.io/name: {{ .Values.repo }}-dev-{{ .Values.branch }}
-    helm.sh/chart: {{ include "dev-helm.chart" . }}
+    app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" }}
+    helm.sh/chart: {{ include "django-development-chart.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Values.repo }}-dev-{{ .Values.branch }}
+      app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Values.repo }}-dev-{{ .Values.branch }}
+        app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       containers:
-        - name: {{ .Values.repo }}-dev-{{ .Values.branch }}
+        - name: {{ include "django-development-chart.release-identifier" }}
           image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.branch }}"
           imagePullPolicy: "Always"
           env:
