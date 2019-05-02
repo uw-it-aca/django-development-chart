@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}"
+  labels:
+    app.kubernetes.io/managed-by: {{.Release.Service | quote }}
+    app.kubernetes.io/instance: {{.Release.Name | quote }}
+    helm.sh/chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "django-development-chart.release-identifier" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" . }}
+    helm.sh/chart: {{ include "django-development-chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}"
+      labels:
+        app.kubernetes.io/managed-by: {{.Release.Service | quote }}
+        app.kubernetes.io/instance: {{.Release.Name | quote }}
+        helm.sh/chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: {{ include "django-development-chart.release-identifier" . }}
+          image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.branch }}"
+          imagePullPolicy: "Always"
+          env:
+            - name: DB
+              value: "mysql"
+            - name: BRANCH
+              value: "{{ .Values.branch }}"
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rds
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rds
+                  key: password
+            - name: DATABASE_DB_NAME
+              value: "{{ .Values.branch | replace "-" "_" }}"
+            - name: DATABASE_HOSTNAME
+              value: "rds.default.svc.cluster.local"
+            - name: ENV
+              value: "dev"
+          command: [".", "/scripts/deploy.sh"]
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+
+      
