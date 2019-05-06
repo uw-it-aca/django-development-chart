@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: {{ include "django-development-chart.release-identifier" . }}
-          image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.branch }}"
+          image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.commitHash }}"
           imagePullPolicy: "Always"
           restartPolicy: "Always"
           env:
