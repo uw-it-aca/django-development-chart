@@ -15,7 +15,7 @@ metadata:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "django-development-chart.release-identifier" . }}-release-job-{{ .Values.commitHash }}
+  name: {{ include "django-development-chart.release-identifier" . }}-release-job-{{ .Values.commitHash | - 7 }}
   labels:
     app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" . }}
     helm.sh/chart: {{ include "django-development-chart.chart" . }}
