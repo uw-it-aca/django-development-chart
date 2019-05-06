@@ -12,8 +12,8 @@ metadata:
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": hook-succeeded
-apiVersion: apps/v1beta2
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: {{ include "django-development-chart.release-identifier" . }}
   labels:

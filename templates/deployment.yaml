@@ -23,6 +23,7 @@ spec:
         - name: {{ include "django-development-chart.release-identifier" . }}
           image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.branch }}"
           imagePullPolicy: "Always"
+          restartPolicy: "Always"
           env:
             - name: DB
               value: "mysql"
