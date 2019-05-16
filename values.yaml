@@ -39,8 +39,16 @@ resources:
     cpu: 100m
     memory: 128Mi
 
+database:
+  engine: "mysql"
+  secretName: "rds"
+  hostname: "rds.default.svc.cluster.local"
+
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+certs:
+  mounted: false
