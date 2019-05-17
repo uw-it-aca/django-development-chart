@@ -31,33 +31,33 @@ spec:
           volumes:
             - name: certs-volume
               secret:
-                secretName: {{ .Values.certs.secretName }}
+                secretName: {{ .Values.certs.secretName | quote }}
 {{- end }}
           env:
 {{- if .Values.certs.mounted }}
             - name: CERT_PATH
-              value: "{{ .Values.certName }}"
+              value: {{ .Values.certName | quote }}
             - name: KEY_PATH
-              value: "{{ .Values.keyName }}"
+              value: {{ .Values.keyName | quote }}
 {{- end }}
             - name: DB
-              value: {{ .Values.database.engine }}
+              value: {{ .Values.database.engine | quote }}
             - name: BRANCH
-              value: "{{ .Values.branch }}"
+              value: {{ .Values.branch | quote }}
             - name: DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.database.secretName }}
+                  name: {{ .Values.database.secretName | quote}}
                   key: username
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.database.secretName }}
+                  name: {{ .Values.database.secretName | quote }}
                   key: password
             - name: DATABASE_DB_NAME
-              value: "{{ .Values.branch | replace "-" "_" }}"
+              value: {{ .Values.branch | quote | replace "-" "_" }}
             - name: DATABASE_HOSTNAME
-              value: "{{ .Values.database.hostname }}"
+              value: {{ .Values.database.hostname | quote }}
 {{ toYaml .Values.environmentVariables | indent 12 }}
           ports:
             - name: http
