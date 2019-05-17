@@ -23,32 +23,57 @@ spec:
         - name: {{ include "django-development-chart.release-identifier" . }}
           image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.commitHash }}"
           imagePullPolicy: "Always"
+{{- if .Values.certs.mounted}}
+          volumeMounts:
+            - name: certs-volume
+              readOnly: true
+              mountPath: "/certs"
+          volumes:
+            - name: certs-volume
+              secret:
+                secretName: {{ .Values.certs.secretName | quote }}
+{{- end }}
           env:
+{{- if .Values.certs.mounted }}
+            - name: CERT_PATH
+              value: {{ .Values.certName | quote }}
+            - name: KEY_PATH
+              value: {{ .Values.keyName | quote }}
+{{- end }}
             - name: DB
-              value: "mysql"
+              value: {{ .Values.database.engine | quote }}
             - name: BRANCH
-              value: "{{ .Values.branch }}"
+              value: {{ .Values.branch | quote }}
             - name: DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: rds
+                  name: {{ .Values.database.secretName | quote }}
                   key: username
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: rds
+                  name: {{ .Values.database.secretName | quote }}
                   key: password
             - name: DATABASE_DB_NAME
-              value: "{{ .Values.branch | replace "-" "_" }}"
+              value: {{ .Values.branch | quote | replace "-" "_" }}
             - name: DATABASE_HOSTNAME
-              value: "rds.default.svc.cluster.local"
-            - name: ENV
-              value: "dev"
-            - name: PORT
-              value: "8080"
+              value: {{ .Values.database.hostname | quote }}
+{{ toYaml .Values.environmentVariables | indent 12 }}
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
