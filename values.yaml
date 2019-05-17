@@ -52,3 +52,9 @@ affinity: {}
 
 certs:
   mounted: false
+
+environmentVariables:
+  - name: "ENV"
+    value: "dev"
+  - name: "PORT"
+    value: "8080"

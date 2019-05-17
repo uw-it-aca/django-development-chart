@@ -58,10 +58,6 @@ spec:
               value: "{{ .Values.branch | replace "-" "_" }}"
             - name: DATABASE_HOSTNAME
               value: "{{ .Values.database.hostname }}"
-            - name: ENV
-              value: "dev"
-            - name: PORT
-              value: "8080"
 {{ toYaml .Values.environmentVariables | indent 12 }}
           ports:
             - name: http
