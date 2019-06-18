@@ -1,0 +1,79 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "django-development-chart.release-identifier" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" . }}
+    helm.sh/chart: {{ include "django-development-chart.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "django-development-chart.release-identifier" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ include "django-development-chart.release-identifier" . }}
+          image: "{{ .Values.aws_account | replace ":" "" }}.dkr.ecr.us-west-2.amazonaws.com/{{ .Values.repo }}-provisioner-web-ecr:{{ .Values.commitHash }}"
+          imagePullPolicy: "Always"
+{{- if .Values.certs.mounted}}
+          volumeMounts:
+            - name: certs-volume
+              readOnly: true
+              mountPath: "/certs"
+          volumes:
+            - name: certs-volume
+              secret:
+                secretName: {{ .Values.certs.secretName | quote }}
+{{- end }}
+          env:
+{{- if .Values.certs.mounted }}
+            - name: CERT_PATH
+              value: {{ .Values.certName | quote }}
+            - name: KEY_PATH
+              value: {{ .Values.keyName | quote }}
+{{- end }}
+            - name: DB
+              value: {{ .Values.database.engine | quote }}
+            - name: BRANCH
+              value: {{ .Values.branch | quote }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName | quote }}
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.database.secretName | quote }}
+                  key: password
+            - name: DATABASE_DB_NAME
+              value: {{ .Values.branch | quote | replace "-" "_" }}
+            - name: DATABASE_HOSTNAME
+              value: {{ .Values.database.hostname | quote }}
+{{ toYaml .Values.environmentVariables | indent 12 }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
