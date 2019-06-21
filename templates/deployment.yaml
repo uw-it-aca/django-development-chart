@@ -58,6 +58,8 @@ spec:
               value: {{ .Values.branch | quote | replace "-" "_" }}
             - name: DATABASE_HOSTNAME
               value: {{ .Values.database.hostname | quote }}
+            - name: DJANGO_SECRET
+              value: {{ .Values.django_secret }}
 {{ toYaml .Values.environmentVariables | indent 12 }}
           ports:
             - name: http
